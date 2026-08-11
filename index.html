@@ -614,8 +614,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
           <label for="fmsg">Message</label>
           <textarea id="fmsg" name="Message" rows="4" required></textarea>
         </div>
+        <input type="hidden" name="_next" id="formNext" value="">
         <button type="submit" class="btn btn-primary">Start a Project ↗</button>
-        <p class="form-note">Sends straight to Yusra's inbox. On first submission FormSubmit sends a one-time confirmation link to yusraqadeerwork@gmail.com — click it once to activate, then every message arrives automatically (check the spam/promotions folder if it doesn't show up in a few minutes).</p>
+        <p class="form-note">Yusra is currently available for new Wix &amp; WordPress projects. Send a message using the form and she’ll get back to you within 24 hours.</p>
+        <p class="form-status" id="formStatus" aria-live="polite"></p>
       </form>
       <div class="contact-links">
         <div class="contact-link-row">
@@ -802,9 +804,24 @@ modalClose.addEventListener('click', closeProject);
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeProject(); });
 
 // ---- contact form ----
-// This form submits natively (real POST, not fetch/AJAX) to FormSubmit, which is
-// the reliable mode: it works even when this file is opened locally (file://),
-// where fetch()-based AJAX calls can silently fail due to browser CORS rules.
+// Native POST to FormSubmit. The _next URL is set dynamically so the same
+// portfolio page can show a thank-you message after a successful submission.
+const contactForm = document.getElementById('contactForm');
+const formNext = document.getElementById('formNext');
+const formStatus = document.getElementById('formStatus');
+
+if (contactForm && formNext) {
+  contactForm.addEventListener('submit', () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('sent', '1');
+    url.hash = 'contact';
+    formNext.value = url.toString();
+  });
+}
+
+if (new URLSearchParams(window.location.search).get('sent') === '1' && formStatus) {
+  formStatus.textContent = 'Thank you for your request! Yusra will get back to you within 24 hours.';
+}
 
 // ---- testimonials carousel ----
 const TESTIMONIALS = [
